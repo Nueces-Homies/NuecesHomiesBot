@@ -22,7 +22,7 @@ public class GoogleTests
         this.credentialsJson = System.Text.Encoding.Default.GetString(data);
     }
     
-    [Fact]
+    [Fact(DisplayName = "Get events from a visible calendar")]
     public async Task CanGetCalendarEvents()
     {
         var google = new GoogleClient(this.credentialsJson);
@@ -35,7 +35,7 @@ public class GoogleTests
         result.Updated.Year.Should().BeGreaterOrEqualTo(2022);
     }
 
-    [Fact]
+    [Fact(DisplayName = "Lookup a book in Google Books")]
     public async Task CanLookupBook()
     {
         var google = new GoogleApi.GoogleClient(this.credentialsJson);

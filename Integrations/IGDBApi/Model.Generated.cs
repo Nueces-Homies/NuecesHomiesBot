@@ -6,9 +6,29 @@
 // </auto-generated>
 
 #region Designer generated code
+
+using System.Diagnostics.CodeAnalysis;
+
 #pragma warning disable CS0612, CS0618, CS1591, CS3021, IDE0079, IDE1006, RCS1036, RCS1057, RCS1085, RCS1192
 namespace Integrations.IGDBApi
 {
+    using System.Runtime.CompilerServices;
+    
+    [global::ProtoBuf.ProtoContract()]
+    public partial struct IGDBTimestamp
+    {
+        /// <summary>
+        /// Represents seconds of UTC time since Unix epoch
+        /// </summary>
+        [global::ProtoBuf.ProtoMember(1, Name = "seconds", DataFormat = global::ProtoBuf.DataFormat.Default)]
+        public long Seconds { get; set; }
+
+        /// <summary>
+        /// Non-negative fractions of a second at nanosecond resolution.
+        /// </summary>
+        [global::ProtoBuf.ProtoMember(2, Name = "nanos", DataFormat = global::ProtoBuf.DataFormat.Default)]
+        public int Nanoseconds { get; set; }
+    }
 
     [global::ProtoBuf.ProtoContract()]
     public partial class Count : global::ProtoBuf.IExtensible
@@ -253,7 +273,7 @@ namespace Integrations.IGDBApi
         public string CountryName { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(4, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(5, Name = @"description")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -280,7 +300,7 @@ namespace Integrations.IGDBApi
         public CharacterSpeciesEnum Species { get; set; }
 
         [global::ProtoBuf.ProtoMember(12, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(13, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -363,7 +383,7 @@ namespace Integrations.IGDBApi
         public ulong Id { get; set; }
 
         [global::ProtoBuf.ProtoMember(2, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"games")]
         public global::System.Collections.Generic.List<Game> Games { get; set; } = new global::System.Collections.Generic.List<Game>();
@@ -377,7 +397,7 @@ namespace Integrations.IGDBApi
         public string Slug { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(6, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(7, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -412,7 +432,7 @@ namespace Integrations.IGDBApi
         public ulong Id { get; set; }
 
         [global::ProtoBuf.ProtoMember(2, Name = @"change_date", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? ChangeDate { get; set; }
+        public IGDBTimestamp? ChangeDate { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"change_date_category")]
         public DateFormatChangeDateCategoryEnum ChangeDateCategory { get; set; }
@@ -424,7 +444,7 @@ namespace Integrations.IGDBApi
         public int Country { get; set; }
 
         [global::ProtoBuf.ProtoMember(6, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(7, Name = @"description")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -451,13 +471,13 @@ namespace Integrations.IGDBApi
         public string Slug { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(14, Name = @"start_date", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? StartDate { get; set; }
+        public IGDBTimestamp? StartDate { get; set; }
 
         [global::ProtoBuf.ProtoMember(15, Name = @"start_date_category")]
         public DateFormatChangeDateCategoryEnum StartDateCategory { get; set; }
 
         [global::ProtoBuf.ProtoMember(16, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(17, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -638,7 +658,7 @@ namespace Integrations.IGDBApi
         public ExternalGameCategoryEnum Category { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(4, Name = @"game")]
         public Game Game { get; set; }
@@ -652,7 +672,7 @@ namespace Integrations.IGDBApi
         public string Uid { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(7, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(8, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -675,7 +695,7 @@ namespace Integrations.IGDBApi
         public string Checksum { get; set; } = "";
 
     }
-
+    
     [global::ProtoBuf.ProtoContract()]
     public partial class FranchiseResult : global::ProtoBuf.IExtensible
     {
@@ -699,8 +719,8 @@ namespace Integrations.IGDBApi
         public ulong Id { get; set; }
 
         [global::ProtoBuf.ProtoMember(2, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
-
+        public IGDBTimestamp? CreatedAt { get; set; }
+        
         [global::ProtoBuf.ProtoMember(3, Name = @"games")]
         public global::System.Collections.Generic.List<Game> Games { get; set; } = new global::System.Collections.Generic.List<Game>();
 
@@ -713,7 +733,7 @@ namespace Integrations.IGDBApi
         public string Slug { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(6, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(7, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -775,7 +795,7 @@ namespace Integrations.IGDBApi
         public Cover Cover { get; set; }
 
         [global::ProtoBuf.ProtoMember(11, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(12, Name = @"dlcs")]
         public global::System.Collections.Generic.List<Game> Dlcs { get; set; } = new global::System.Collections.Generic.List<Game>();
@@ -787,7 +807,7 @@ namespace Integrations.IGDBApi
         public global::System.Collections.Generic.List<ExternalGame> ExternalGames { get; set; } = new global::System.Collections.Generic.List<ExternalGame>();
 
         [global::ProtoBuf.ProtoMember(15, Name = @"first_release_date", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? FirstReleaseDate { get; set; }
+        public IGDBTimestamp? FirstReleaseDate { get; set; }
 
         [global::ProtoBuf.ProtoMember(16, Name = @"follows")]
         public int Follows { get; set; }
@@ -878,7 +898,7 @@ namespace Integrations.IGDBApi
         public int TotalRatingCount { get; set; }
 
         [global::ProtoBuf.ProtoMember(44, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(45, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -950,7 +970,7 @@ namespace Integrations.IGDBApi
         public global::System.Collections.Generic.List<Company> Companies { get; set; } = new global::System.Collections.Generic.List<Company>();
 
         [global::ProtoBuf.ProtoMember(3, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(4, Name = @"description")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -971,7 +991,7 @@ namespace Integrations.IGDBApi
         public string Slug { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(9, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(10, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1067,10 +1087,10 @@ namespace Integrations.IGDBApi
         public Region Region { get; set; }
 
         [global::ProtoBuf.ProtoMember(6, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(7, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(8, Name = @"checksum")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1101,7 +1121,7 @@ namespace Integrations.IGDBApi
         public ulong Id { get; set; }
 
         [global::ProtoBuf.ProtoMember(2, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"name")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1112,7 +1132,7 @@ namespace Integrations.IGDBApi
         public string Slug { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(5, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(6, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1147,7 +1167,7 @@ namespace Integrations.IGDBApi
         public ulong Id { get; set; }
 
         [global::ProtoBuf.ProtoMember(2, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"features")]
         public global::System.Collections.Generic.List<GameVersionFeature> Features { get; set; } = new global::System.Collections.Generic.List<GameVersionFeature>();
@@ -1159,7 +1179,7 @@ namespace Integrations.IGDBApi
         public global::System.Collections.Generic.List<Game> Games { get; set; } = new global::System.Collections.Generic.List<Game>();
 
         [global::ProtoBuf.ProtoMember(6, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(7, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1319,7 +1339,7 @@ namespace Integrations.IGDBApi
         public ulong Id { get; set; }
 
         [global::ProtoBuf.ProtoMember(2, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"name")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1330,7 +1350,7 @@ namespace Integrations.IGDBApi
         public string Slug { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(5, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(6, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1368,7 +1388,7 @@ namespace Integrations.IGDBApi
         public Company Company { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(4, Name = @"developer")]
         public bool Developer { get; set; }
@@ -1386,7 +1406,7 @@ namespace Integrations.IGDBApi
         public bool Supporting { get; set; }
 
         [global::ProtoBuf.ProtoMember(9, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(10, Name = @"checksum")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1417,7 +1437,7 @@ namespace Integrations.IGDBApi
         public ulong Id { get; set; }
 
         [global::ProtoBuf.ProtoMember(2, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"name")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1428,7 +1448,7 @@ namespace Integrations.IGDBApi
         public string Slug { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(5, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(6, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1475,10 +1495,10 @@ namespace Integrations.IGDBApi
         public string Locale { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(5, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(6, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(7, Name = @"checksum")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1518,10 +1538,10 @@ namespace Integrations.IGDBApi
         public LanguageSupportType LanguageSupportType { get; set; }
 
         [global::ProtoBuf.ProtoMember(5, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(6, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(7, Name = @"checksum")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1556,10 +1576,10 @@ namespace Integrations.IGDBApi
         public string Name { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(3, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(4, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(5, Name = @"checksum")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1668,7 +1688,7 @@ namespace Integrations.IGDBApi
         public PlatformCategoryEnum Category { get; set; }
 
         [global::ProtoBuf.ProtoMember(5, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(6, Name = @"generation")]
         public int Generation { get; set; }
@@ -1692,7 +1712,7 @@ namespace Integrations.IGDBApi
         public string Summary { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(12, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(13, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1961,10 +1981,10 @@ namespace Integrations.IGDBApi
         public DateFormatChangeDateCategoryEnum Category { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(4, Name = @"date", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? Date { get; set; }
+        public IGDBTimestamp? Date { get; set; }
 
         [global::ProtoBuf.ProtoMember(5, Name = @"human")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -1980,7 +2000,7 @@ namespace Integrations.IGDBApi
         public RegionRegionEnum Region { get; set; }
 
         [global::ProtoBuf.ProtoMember(9, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(10, Name = @"y")]
         public int Y { get; set; }
@@ -2052,7 +2072,7 @@ namespace Integrations.IGDBApi
         public ulong Id { get; set; }
 
         [global::ProtoBuf.ProtoMember(2, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"name")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -2063,7 +2083,7 @@ namespace Integrations.IGDBApi
         public string Slug { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(5, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(6, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -2110,10 +2130,10 @@ namespace Integrations.IGDBApi
         public string Identifier { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(5, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(6, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(7, Name = @"checksum")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -2147,10 +2167,10 @@ namespace Integrations.IGDBApi
         public DateFormatChangeDateCategoryEnum Category { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(4, Name = @"date", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? Date { get; set; }
+        public IGDBTimestamp? Date { get; set; }
 
         [global::ProtoBuf.ProtoMember(5, Name = @"game")]
         public Game Game { get; set; }
@@ -2169,7 +2189,7 @@ namespace Integrations.IGDBApi
         public RegionRegionEnum Region { get; set; }
 
         [global::ProtoBuf.ProtoMember(10, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(11, Name = @"y")]
         public int Y { get; set; }
@@ -2281,7 +2301,7 @@ namespace Integrations.IGDBApi
         public Platform Platform { get; set; }
 
         [global::ProtoBuf.ProtoMember(10, Name = @"published_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? PublishedAt { get; set; }
+        public IGDBTimestamp? PublishedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(11, Name = @"test_dummy")]
         public TestDummy TestDummy { get; set; }
@@ -2321,7 +2341,7 @@ namespace Integrations.IGDBApi
         public bool BoolValue { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(4, Name = @"enum_test")]
         public TestDummyEnumTestEnum EnumTest { get; set; }
@@ -2362,7 +2382,7 @@ namespace Integrations.IGDBApi
         public TestDummy test_dummy { get; set; }
 
         [global::ProtoBuf.ProtoMember(16, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(17, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -2397,7 +2417,7 @@ namespace Integrations.IGDBApi
         public ulong Id { get; set; }
 
         [global::ProtoBuf.ProtoMember(2, Name = @"created_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? CreatedAt { get; set; }
+        public IGDBTimestamp? CreatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(3, Name = @"name")]
         [global::System.ComponentModel.DefaultValue("")]
@@ -2408,7 +2428,7 @@ namespace Integrations.IGDBApi
         public string Slug { get; set; } = "";
 
         [global::ProtoBuf.ProtoMember(5, Name = @"updated_at", DataFormat = global::ProtoBuf.DataFormat.WellKnown)]
-        public global::System.DateTime? UpdatedAt { get; set; }
+        public IGDBTimestamp? UpdatedAt { get; set; }
 
         [global::ProtoBuf.ProtoMember(6, Name = @"url")]
         [global::System.ComponentModel.DefaultValue("")]

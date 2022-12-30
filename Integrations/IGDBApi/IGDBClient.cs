@@ -26,14 +26,14 @@ public partial class IGDBClient
         if (this.token.IsExpired)
         {
             this.token = await IGDBClient.TokenUrl.SetQueryParams(
-                 new
-                 {
-                     client_id = this.clientId,
-                     client_secret = this.clientSecret,
-                     grant_type = "client_credentials",
-                 })
-             .PostAsync()
-             .ReceiveJson<Token>();
+                                 new
+                                 {
+                                     client_id = this.clientId,
+                                     client_secret = this.clientSecret,
+                                     grant_type = "client_credentials",
+                                 })
+                             .PostAsync()
+                             .ReceiveJson<Token>();
         }
 
         return this.token.AccessToken;
@@ -43,18 +43,26 @@ public partial class IGDBClient
     {
         var accessToken = await this.GetTokenAsync();
 
-        var result = await IGDBClient.IGDBBaseUrl
-                         .AppendPathSegment($"{endpoint}.pb")
-                         .WithHeader("Client-ID", this.clientId)
-                         .WithOAuthBearerToken(accessToken)
-                         .PostStringAsync(query);
-
-        if (result.StatusCode >= 400)
+        IFlurlResponse response;
+        try
         {
-            throw new IGDBClientException(result.StatusCode, await result.GetStringAsync());
+            response = await IGDBClient.IGDBBaseUrl
+                             .AppendPathSegment($"{endpoint}.pb")
+                             .WithHeader("Client-ID", this.clientId)
+                             .WithOAuthBearerToken(accessToken)
+                             .PostStringAsync(query);
+        }
+        catch (FlurlHttpException httpException)
+        {
+            if (httpException.StatusCode == 400)
+            {
+                throw new IGDBBadQueryException(query, endpoint, httpException);
+            }
+            
+            throw new IGDBBadRequestException(query, endpoint, httpException);
         }
 
-        return Serializer.Deserialize<T>(await result.GetStreamAsync());
+        return Serializer.Deserialize<T>(await response.GetStreamAsync());
     }
 
     private readonly record struct Token(
@@ -70,14 +78,26 @@ public partial class IGDBClient
     }
 }
 
-internal class IGDBClientException : Exception
+public class IGDBClientException : Exception
 {
-    private readonly int statusCode;
-    private readonly string body;
-    
-    public IGDBClientException(int statusCode, string data) : base($"IGDB Request Failed. Status Code={statusCode}")
+    public IGDBClientException(string message, Exception innerException) : base(message, innerException)
     {
-        this.statusCode = statusCode;
-        this.body = data;
+    }
+}
+
+public class IGDBBadQueryException : IGDBClientException
+{
+    public IGDBBadQueryException(string query, string endpoint, FlurlHttpException innerException) 
+        : base($"Invalid query for endpoint {endpoint}: {query}",
+        innerException)
+    {
+    }
+}
+public class IGDBBadRequestException : IGDBClientException
+{
+    public IGDBBadRequestException(string query, string endpoint, FlurlHttpException innerException) 
+        : base($"Unable to complete request to {endpoint} for query: {query}",
+        innerException)
+    {
     }
 }
