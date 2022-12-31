@@ -1,9 +1,10 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 
 namespace Integrations.Test;
+
+using GoogleApi;
 
 public class GoogleTests
 {
@@ -21,10 +22,10 @@ public class GoogleTests
         this.credentialsJson = System.Text.Encoding.Default.GetString(data);
     }
     
-    [Fact]
+    [Fact(DisplayName = "Get events from a visible calendar")]
     public async Task CanGetCalendarEvents()
     {
-        var google = new GoogleApi.Google(this.credentialsJson);
+        var google = new GoogleClient(this.credentialsJson);
 
         // Summer Games Fest calendar
         const string calendarId = "s71id26u0afr69leltrq0us0b97jp35k@import.calendar.google.com";
@@ -34,10 +35,10 @@ public class GoogleTests
         result.Updated.Year.Should().BeGreaterOrEqualTo(2022);
     }
 
-    [Fact]
+    [Fact(DisplayName = "Lookup a book in Google Books")]
     public async Task CanLookupBook()
     {
-        var google = new GoogleApi.Google(this.credentialsJson);
+        var google = new GoogleApi.GoogleClient(this.credentialsJson);
         const string isbn = "0316440884";
         var result = await google.LookupBookAsync(isbn);
 

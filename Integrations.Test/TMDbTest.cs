@@ -19,7 +19,7 @@ public class TMDbTest
         this.tmdbKey = config["TMDB_KEY"] ?? throw new Exception("TMDB_KEY missing");
     }
     
-    [Fact]
+    [Fact(DisplayName = "Lookup a movie in TMDB")]
     public async Task CanLookupMovies()
     {
         var tmdb = new TMDb(this.tmdbKey);
@@ -31,7 +31,7 @@ public class TMDbTest
         movie.ReleaseDate.Should().BeOfType(typeof(ReleaseDate.KnownReleaseDate));
     }
 
-    [Fact]
+    [Fact(DisplayName = "Lookup an unreleased movie in TMDB")]
     public async Task CanLookupUnreleasedMovie()
     {
         var tmdb = new TMDb(this.tmdbKey);

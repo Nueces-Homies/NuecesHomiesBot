@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Books.v1;
-using Google.Apis.Books.v1.Data;
 using Google.Apis.Calendar.v3;
 using Google.Apis.Services;
 
@@ -13,12 +12,12 @@ namespace Integrations.GoogleApi
         Task<Book?> LookupBookAsync(string isbn);
     }
 
-    public class Google : IGoogle
+    public class GoogleClient : IGoogle
     {
         private readonly CalendarService calendarService;
         private readonly BooksService booksService;
     
-        public Google(string credentialsJson)
+        public GoogleClient(string credentialsJson)
         {
             var credentials = GoogleCredential
                 .FromJson(credentialsJson)
