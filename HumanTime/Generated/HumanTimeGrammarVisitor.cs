@@ -50,6 +50,12 @@ public interface IHumanTimeGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitDate([NotNull] HumanTimeGrammarParser.DateContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.year"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitYear([NotNull] HumanTimeGrammarParser.YearContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.longDateWithoutYear"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -62,11 +68,11 @@ public interface IHumanTimeGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitLongDateWithYear([NotNull] HumanTimeGrammarParser.LongDateWithYearContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.shortDateWithoutYear"/>.
+	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.twoNumbers"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitShortDateWithoutYear([NotNull] HumanTimeGrammarParser.ShortDateWithoutYearContext context);
+	Result VisitTwoNumbers([NotNull] HumanTimeGrammarParser.TwoNumbersContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.shortDateWithYear"/>.
 	/// </summary>
@@ -109,6 +115,48 @@ public interface IHumanTimeGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitMonth([NotNull] HumanTimeGrammarParser.MonthContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.broadDate"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitBroadDate([NotNull] HumanTimeGrammarParser.BroadDateContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.season"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSeason([NotNull] HumanTimeGrammarParser.SeasonContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.quarter"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitQuarter([NotNull] HumanTimeGrammarParser.QuarterContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.trimester"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitTrimester([NotNull] HumanTimeGrammarParser.TrimesterContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.semester"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSemester([NotNull] HumanTimeGrammarParser.SemesterContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.namedWindow"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitNamedWindow([NotNull] HumanTimeGrammarParser.NamedWindowContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.monthWindow"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMonthWindow([NotNull] HumanTimeGrammarParser.MonthWindowContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="HumanTimeGrammarParser.hour"/>.
 	/// </summary>
