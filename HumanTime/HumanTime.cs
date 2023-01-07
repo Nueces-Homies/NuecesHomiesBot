@@ -81,22 +81,19 @@ public abstract record HumanTime
 
         return result switch
         {
-            ParseError parseError                  => throw new Exception(parseError.Reason),
             ParseSuccess { Output: var humanTime } => humanTime,
-            _                                      => throw new Exception($"Unexpected type {result.GetType()}")
+            _                                      => throw new ParseError($"Unexpected type {result.GetType()}")
         };
     }
-
-    public abstract HumanTime WithYear(int year);
 }
 
 public sealed record HumanDate : HumanTime
 {
     public override HumanTimeType TimeType => HumanTimeType.Date;
     
-    public required DateOnly Date { get; init; }
+    public new required DateOnly Date { get; init; }
 
-    public override HumanTime WithYear(int year)
+    public HumanTime WithYear(int year)
     {
         return new HumanDate { Date = new DateOnly(year, this.Date.Month, this.Date.Day) };
     }
@@ -108,9 +105,9 @@ public sealed record HumanDateTime : HumanTime
 {
     public override HumanTimeType TimeType => HumanTimeType.DateTime;
     
-    public required DateTimeOffset DateTime { get; init; }
+    public new required DateTimeOffset DateTime { get; init; }
     
-    public override HumanTime WithYear(int year)
+    public HumanTime WithYear(int year)
     {
         return new HumanDateTime
         {
@@ -131,14 +128,6 @@ public sealed record HumanTimeWindow : HumanTime
     public required string Description { get; init; }
     public required HumanTimeWindowType WindowType { get; init; }
     public required DateOnly StartDate { get; init; }
-
-    public override HumanTime WithYear(int year)
-    {
-        return this with
-        {
-            StartDate = new DateOnly(year, StartDate.Month, StartDate.Day)
-        };
-    }
 
     public override string ToString() => Description;
 }

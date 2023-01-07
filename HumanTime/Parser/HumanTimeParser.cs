@@ -8,15 +8,15 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
 
     private bool explicitYear = false;
     private bool explicitDate = false;
-    
-    private static DateTimeOffset Now
+
+    private static readonly Lazy<DateTimeOffset> Now = new (() =>
     {
-        get
-        {
-            var centralTimeZone = HumanTimeParser.TimeZoneCache["CT"];
-            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, centralTimeZone);
-        }
-    }
+        var centralTimeZone = HumanTimeParser.TimeZoneCache["CT"];
+        var dt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, centralTimeZone);
+        var rounded = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0);
+        var offset = centralTimeZone.GetUtcOffset(rounded);
+        return new DateTimeOffset(rounded, offset);
+    });
 
     protected override ParseResult AggregateResult(ParseResult? aggregate, ParseResult? nextResult)
     {
@@ -36,18 +36,18 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
         {
             case ParseSuccess {Output: HumanDate date}:
                 HumanTime dateOutput = date;
-                if (this.explicitYear == false && date.Date < DateOnly.FromDateTime(DateTime.Now.Date))
+                if (this.explicitYear == false && date.Date < DateOnly.FromDateTime(Now.Value.Date))
                 {
-                    dateOutput = date.WithYear(Now.Year + 1);
+                    dateOutput = date.WithYear(Now.Value.Year + 1);
                 }
 
                 return new ParseSuccess(dateOutput);
             
             case ParseSuccess {Output: HumanDateTime dateTime}:
                 HumanTime dateTimeOutput = dateTime;
-                if (this.explicitDate == false && dateTime.DateTime < DateTime.Now.Date)
+                if (this.explicitDate == false && dateTime.DateTime < Now.Value.Date)
                 {
-                    dateTimeOutput = dateTime.WithYear(Now.Year + 1);
+                    dateTimeOutput = dateTime.WithYear(HumanTimeParser.Now.Value.Year + 1);
                 }
 
                 return new ParseSuccess(dateTimeOutput);
@@ -64,13 +64,11 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
         var dateResult = VisitDate(context.date());
         switch (dateResult)
         {
-            case ParseError parseError:
-                return parseError;
             case ParseSuccess { Output: HumanDate exactDate}:
                 date = exactDate.Date;
                 break;
             default:
-                return new ParseError($"Date can only be {nameof(HumanDate)}. Got {dateResult.GetType()}");
+                throw new ParseError($"Date can only be {nameof(HumanDate)}. Got {dateResult.GetType()}");
         }
 
         TimeOnly time;
@@ -78,14 +76,12 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
         var timeResult = VisitTime(context.time());
         switch (timeResult)
         {
-            case ParseError parseError:
-                return parseError;
             case TimeResult {Time: var resultTime, TimeZone: var resultTz}:
                 time = resultTime;
                 timeZone = resultTz;
                 break;
             default:
-                return new ParseError($"Time can only be {nameof(TimeResult)}. Got {timeResult.GetType()}");
+                throw new ParseError($"Time can only be {nameof(TimeResult)}. Got {timeResult.GetType()}");
         }
 
         return new ParseSuccess(HumanTime.DateTime(date, time, timeZone));
@@ -93,7 +89,7 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
 
     public override ParseResult VisitDate(HumanTimeGrammarParser.DateContext context)
     {
-        var now = HumanTimeParser.Now;
+        var now = HumanTimeParser.Now.Value;
         var today = DateOnly.FromDateTime(now.DateTime);
 
         if (context.NOW() != null)
@@ -130,11 +126,8 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
     public override ParseResult VisitLongDateWithYear(HumanTimeGrammarParser.LongDateWithYearContext context)
     {
         string yearText = context.INT().GetText();
-        if (!int.TryParse(yearText, out var year))
-        {
-            return new ParseError($"Unable to parse year {yearText}");
-        }
-
+        var year = int.Parse(yearText);
+            
         if (year < 100)
         {
             year += 2000;
@@ -144,14 +137,13 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
         
         switch (result)
         {
-            case ParseError error:
-                return error;
             case ParseSuccess { Output: HumanDate dateResult}:
                 DateOnly date = dateResult.Date;
+                this.explicitYear = true;
                 this.explicitDate = true;
                 return new ParseSuccess(HumanTime.Date(year, date.Month, date.Day));
             default:
-                return new ParseError($"Unexpected result. Got {result.GetType()}");
+                throw new ParseError($"Unexpected result. Got {result.GetType()}");
         }
     }
 
@@ -160,28 +152,23 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
         ParseResult result = this.VisitMonth(context.month());
 
         int month;
+        int year;
         switch (result)
         {
-            case ParseError error:
-                return error;
-            case MonthResult monthNode:
-                month = monthNode.MonthNumber;
+            case ParseSuccess {Output: HumanTimeWindow {WindowType: HumanTimeWindowType.Month, StartDate: var startDate} }:
+                month = startDate.Month;
+                year = startDate.Year;
                 break;
             default:
-                return new ParseError($"Expected a month. Got {result.GetType()}");
+                throw new ParseError($"Expected a month. Got {result.GetType()}");
         } 
         
         string dayText = context.INT().GetText();
-        if (!int.TryParse(dayText, out var day))
-        {
-            return new ParseError($"Unable to parse day {dayText}");
-        }
+        var day = int.Parse(dayText);
         
-        int year = HumanTimeParser.Now.Year;
-
         if (day > DateTime.DaysInMonth(year, month))
         {
-            return new ParseError($"{day} is greater than number of days in month {month}");
+            throw new ParseError($"{day} is greater than number of days in month {month}");
         }
 
         this.explicitDate = true;
@@ -190,20 +177,21 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
 
     public override ParseResult VisitMonth(HumanTimeGrammarParser.MonthContext context)
     {
-        if (context.JANUARY() != null) return new MonthResult(1);
-        if (context.FEBRUARY() != null) return new MonthResult(2);
-        if (context.MARCH() != null) return new MonthResult(3);
-        if (context.APRIL() != null) return new MonthResult(4);
-        if (context.MAY() != null) return new MonthResult(5);
-        if (context.JUNE() != null) return new MonthResult(6);
-        if (context.JULY() != null) return new MonthResult(7);
-        if (context.AUGUST() != null) return new MonthResult(1);
-        if (context.SEPTEMBER() != null) return new MonthResult(9);
-        if (context.OCTOBER() != null) return new MonthResult(10);
-        if (context.NOVEMBER() != null) return new MonthResult(11);
-        if (context.DECEMBER() != null) return new MonthResult(12);
+        int year = Now.Value.Year;
+        if (context.JANUARY() != null) return new ParseSuccess(HumanTime.Month(year, 1));
+        if (context.FEBRUARY() != null) return new ParseSuccess(HumanTime.Month(year, 2));
+        if (context.MARCH() != null) return new ParseSuccess(HumanTime.Month(year, 3));
+        if (context.APRIL() != null) return new ParseSuccess(HumanTime.Month(year, 4));
+        if (context.MAY() != null) return new ParseSuccess(HumanTime.Month(year, 5));
+        if (context.JUNE() != null) return new ParseSuccess(HumanTime.Month(year, 6));
+        if (context.JULY() != null) return new ParseSuccess(HumanTime.Month(year, 7));
+        if (context.AUGUST() != null) return new ParseSuccess(HumanTime.Month(year, 8));
+        if (context.SEPTEMBER() != null) return new ParseSuccess(HumanTime.Month(year, 9));
+        if (context.OCTOBER() != null) return new ParseSuccess(HumanTime.Month(year, 10));
+        if (context.NOVEMBER() != null) return new ParseSuccess(HumanTime.Month(year, 11));
+        if (context.DECEMBER() != null) return new ParseSuccess(HumanTime.Month(year, 12));
 
-        return new ParseError($"Unrecognized month {context.GetText()}");
+        throw new ParseError($"Unrecognized month {context.GetText()}");
     }
 
     /// <summary>
@@ -215,24 +203,18 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
     {
         var intNodes = context.INT();
 
-        int year = HumanTimeParser.Now.Year;
+        int year = HumanTimeParser.Now.Value.Year;
         var monthText = intNodes[0].GetText();
         var dayOrYearText = intNodes[1].GetText();
 
-        if (!int.TryParse(monthText, out var month))
-        {
-            return new ParseError($"Unable to parse month {monthText}");
-        }
+        var month = int.Parse(monthText);
 
         if (month > 12)
         {
-            return new ParseError($"There aren't {month} months in a year!");
+            throw new ParseError($"There aren't {month} months in a year!");
         }
 
-        if (!int.TryParse(dayOrYearText, out var dayOrYear))
-        {
-            return new ParseError($"Unable to parse day {dayOrYearText}");
-        }
+        var dayOrYear = int.Parse(dayOrYearText);
 
         if (dayOrYear > DateTime.DaysInMonth(year, month))
         {
@@ -253,29 +235,19 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
         var dayText = intNodes[1].GetText();
         var yearText = intNodes[2].GetText();
 
-        if (!int.TryParse(monthText, out var month))
-        {
-            return new ParseError($"Unable to parse month {monthText}");
-        }
+        var month = int.Parse(monthText);
 
         if (month > 12)
         {
-            return new ParseError($"There aren't {month} months in a year");
+            throw new ParseError($"There aren't {month} months in a year");
         }
 
-        if (!int.TryParse(dayText, out var day))
-        {
-            return new ParseError($"Unable to parse day {dayText}");
-        }
-
-        if (!int.TryParse(yearText, out var year))
-        {
-            return new ParseError($"Unable to parse year {yearText}");
-        }
-
+        var day = int.Parse(dayText);
+        var year = int.Parse(yearText);
+        
         if (day > DateTime.DaysInMonth(year, month))
         {
-            return new ParseError($"Month {month} doesn't have {day} days");
+            throw new ParseError($"Month {month} doesn't have {day} days");
         }
 
         this.explicitDate = true;
@@ -285,7 +257,7 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
 
     public override ParseResult VisitQuarter(HumanTimeGrammarParser.QuarterContext context)
     {
-        int year = Now.Year;
+        int year = Now.Value.Year;
         int quarter = 0;
         
         if (context.Q1() != null)
@@ -306,5 +278,95 @@ internal class HumanTimeParser : HumanTimeGrammarBaseVisitor<ParseResult>
         }
 
         return new ParseSuccess(HumanTime.Quarter(quarter, year));
+    }
+
+    public override ParseResult VisitDateOffsetUnit(HumanTimeGrammarParser.DateOffsetUnitContext context)
+    {
+        if (context.DAYS() != null) return OffsetResult.OneDay;
+        if (context.MONTHS() != null) return OffsetResult.OneMonth;
+        if (context.YEARS() != null) return OffsetResult.OneYear;
+
+        throw new ParseError("Unable to determine offset unit");
+    }
+
+    public override ParseResult VisitDateOffsetCount(HumanTimeGrammarParser.DateOffsetCountContext? context)
+    {
+        if (context == null) return new IntResult(1);
+        
+        return context.INT() == null ? 
+                   new IntResult(1) : 
+                   new IntResult(int.Parse(context.INT().GetText()));
+    }
+
+    public override ParseResult VisitOffsetDirection(HumanTimeGrammarParser.OffsetDirectionContext context)
+    {
+        if (context.FROM() != null || context.AFTER() != null)
+        {
+            return new IntResult(1);
+        }
+        
+        if (context.BEFORE() != null)
+        {
+            return new IntResult(-1);
+        }
+
+        throw new ParseError("Unable to determine offset direction");
+    }
+
+    public override ParseResult VisitDateOffset(HumanTimeGrammarParser.DateOffsetContext context)
+    {
+        int count;
+        var countResult = VisitDateOffsetCount(context.dateOffsetCount());
+        switch (countResult)
+        {
+            case IntResult { Number: var number }:
+                count = number;
+                break;
+            default: throw new ParseError($"Unknown type {countResult.GetType()}");
+        }
+
+        var directionResult = (IntResult) VisitOffsetDirection(context.offsetDirection());
+        int direction = directionResult.Number;
+
+        var unit = (OffsetResult)VisitDateOffsetUnit(context.dateOffsetUnit());
+
+        return (direction * count) * unit;
+    }
+
+    public override ParseResult VisitRelativeDate(HumanTimeGrammarParser.RelativeDateContext context)
+    {
+        var dateResult = (ParseSuccess)VisitDate(context.date());
+        var offset = (OffsetResult) VisitDateOffset(context.dateOffset());
+
+        switch (dateResult.Output)
+        {
+            case HumanTimeWindow window:
+                throw new ParseError($"Need more specific time than {window}");
+            
+            case HumanDateTime { DateTime: var dto}:
+                return new ParseSuccess(new HumanDateTime{
+                    DateTime = offset.Unit switch
+                    {
+                        OffsetUnit.Days   => dto.AddDays(offset.Count),
+                        OffsetUnit.Months => dto.AddMonths(offset.Count),
+                        OffsetUnit.Years  => dto.AddYears(offset.Count),
+                        _                 => throw new ParseError("Unknown units")
+                    },
+                });
+                    
+            case HumanDate {Date: var date}:
+                return new ParseSuccess(new HumanDate{
+                    Date = offset.Unit switch
+                    {
+                        OffsetUnit.Days   => date.AddDays(offset.Count),
+                        OffsetUnit.Months => date.AddMonths(offset.Count),
+                        OffsetUnit.Years  => date.AddYears(offset.Count),
+                        _                 => throw new ParseError("Unknown units")
+                    },
+                });
+            
+            default:
+                throw new ParseError("Unexpected date result");
+        }
     }
 }

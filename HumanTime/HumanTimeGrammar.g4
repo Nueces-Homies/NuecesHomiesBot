@@ -1,7 +1,7 @@
 grammar HumanTimeGrammar;
 
 input: (date | time | datetime | broadDate) EOF ;
-datetime: time' on 'date | date' at 'time | date' from 'time | date' 'time;
+datetime: time' on 'date | date' at 'time | date' 'time;
 
 date: relativeDate
       | longDateWithoutYear
