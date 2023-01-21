@@ -79,4 +79,47 @@ public class HumanTimeParserTests
         var result = HumanTimeParser.TripleNumbers.ParseOrThrow(input);
         Assert.Equal(new DateOnly(2023, 1, 17), result);
     }
+
+    [Theory]
+    [InlineData("day", HumanTimeParser.OffsetUnit.Days)]
+    [InlineData("days", HumanTimeParser.OffsetUnit.Days)]
+    [InlineData("month", HumanTimeParser.OffsetUnit.Months)]
+    [InlineData("months", HumanTimeParser.OffsetUnit.Months)]
+    [InlineData("year", HumanTimeParser.OffsetUnit.Years)]
+    [InlineData("years", HumanTimeParser.OffsetUnit.Years)]
+    public void TestOffsetUnit(string input, HumanTimeParser.OffsetUnit expected)
+    {
+        var result = HumanTimeParser.OffsetUnitParser.ParseOrThrow(input);
+        Assert.Equal(expected, result);
+    }
+    
+    [Theory]
+    [InlineData("a", 1)]
+    [InlineData("the", 1)]
+    [InlineData("a 51", 51)]
+    [InlineData("the 62", 62)]
+    [InlineData("73", 73)]
+    public void TestOffsetCount(string input, int count)
+    {
+        var result = HumanTimeParser.Count.ParseOrThrow(input);
+        Assert.Equal(count, result);
+    }
+
+    [Theory]
+    [InlineData("the day before", HumanTimeParser.OffsetUnit.Days, -1)]
+    [InlineData("a month after", HumanTimeParser.OffsetUnit.Months, 1)]
+    [InlineData("5 years from", HumanTimeParser.OffsetUnit.Years, 5)]
+    [InlineData("the 12 years before", HumanTimeParser.OffsetUnit.Years, -12)]
+    public void TestOffset(string input, HumanTimeParser.OffsetUnit unit, int count)
+    {
+        var result = HumanTimeParser.Offset.ParseOrThrow(input);
+        Assert.Equal((unit, count), result);
+    }
+
+    [Fact]
+    public void TestDate()
+    {
+        var result = HumanTimeParser.Date.ParseOrThrow("the day before the day after may 5, 2025");
+        Assert.Equal(HumanTime.Date(2025, 5, 5), result);
+    }
 }
