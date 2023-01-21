@@ -114,11 +114,14 @@ public static class HumanTimeParser
     );
 
     internal static readonly Parser<char, HumanTime> Date = OneOf(
-        LongDateWithYear.Select(HumanTime.Date),
-        LongDateWithoutYear.Select(monthDay => HumanTime.Date(monthDay.Item1, monthDay.Item2)),
-        TripleNumbers.Select(date => (HumanTime) new HumanDate {Date = date}),
-        TwoNumbers.Select(monthDay => HumanTime.Date(monthDay.Item1, monthDay.Item2)),
-        RelativeDate
+        Try(LongDateWithYear.Select(HumanTime.Date)),
+        Try(LongDateWithoutYear.Select(monthDay => HumanTime.Date(monthDay.Item1, monthDay.Item2))),
+        Try(TripleNumbers.Select(date => (HumanTime) new HumanDate {Date = date})),
+        Try(TwoNumbers.Select(monthDay => HumanTime.Date(monthDay.Item1, monthDay.Item2))),
+        Try(Keyword("today").Select(_ => HumanTime.Today)),
+        Try(Keyword("tomorrow").Select(_ => HumanTime.Today.AddOffset(OffsetUnit.Days, 1))),
+        Try(Keyword("yesterday").Select(_ => HumanTime.Today.AddOffset(OffsetUnit.Days, -1))),
+        Try(RelativeDate)
     );
 
     private static HumanTime AddOffset(this HumanTime baseTime, OffsetUnit unit, int number)

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Pidgin;
 
 namespace HumanTime;
 
@@ -27,8 +28,8 @@ public abstract record HumanTime
     
     private static readonly TimeZoneInfo CentralTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Chicago");
     
-    private static DateTimeOffset Now => TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.UtcNow.DateTime, CentralTimeZone);
-    private static DateOnly Today => DateOnly.FromDateTime(Now.DateTime);
+    private static DateTimeOffset NowCentral => TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.UtcNow.DateTime, CentralTimeZone);
+    private static DateOnly TodayCentral => DateOnly.FromDateTime(NowCentral.DateTime);
 
     public static HumanTime Date(DateOnly date)
     {
@@ -43,17 +44,30 @@ public abstract record HumanTime
         };
     }
 
-    public static HumanTime Date(int month, int day)
+    public static HumanTime Date(int number1, int number2)
     {
-        var date = new DateOnly(Now.Year, month, day);
-        if (date < Today)
+        int month;
+        if (number2 > 1000)
+        {
+            month = number1;
+            int year = number2;
+            return Month(year, month);
+        }
+
+        month = number1;
+        int day = number2;
+        
+        var date = new DateOnly(NowCentral.Year, month, day);
+        if (date < TodayCentral)
         {
             date = date.AddYears(1);
         }
 
         return new HumanDate() { Date = date };
     }
-    
+
+    public static HumanTime Today => Date(TodayCentral);
+
     public static HumanTime Quarter(int quarter, int year)
     {
         if (quarter is < 1 or > 4)
@@ -92,6 +106,11 @@ public abstract record HumanTime
         {
             DateTime = new DateTimeOffset(dt, offset),
         };
+    }
+
+    public static HumanTime Parse(string timeString)
+    {
+        return HumanTimeParser.Date.ParseOrThrow(timeString.ToLower());
     }
 }
 
