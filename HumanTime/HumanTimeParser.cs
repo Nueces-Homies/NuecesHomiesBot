@@ -63,7 +63,19 @@ public static class HumanTimeParser
         Integer.Before(Punctuation('/')),
         Integer.Before(Punctuation('/')),
         Number);
+    
+    
+    private static Parser<char, DayOfWeek> GenericWeekday(string name, DayOfWeek dayOfWeek) => Try(Keyword(name).ThenReturn(dayOfWeek));
+    private static readonly Parser<char, DayOfWeek> Monday =  GenericWeekday("monday", DayOfWeek.Monday);
+    private static readonly Parser<char, DayOfWeek> Tuesday =  GenericWeekday("tuesday", DayOfWeek.Tuesday);
+    private static readonly Parser<char, DayOfWeek> Wednesday =  GenericWeekday("wednesday", DayOfWeek.Wednesday);
+    private static readonly Parser<char, DayOfWeek> Thursday =  GenericWeekday("thursday", DayOfWeek.Thursday);
+    private static readonly Parser<char, DayOfWeek> Friday =  GenericWeekday("friday", DayOfWeek.Friday);
+    private static readonly Parser<char, DayOfWeek> Saturday =  GenericWeekday("saturday", DayOfWeek.Saturday);
+    private static readonly Parser<char, DayOfWeek> Sunday =  GenericWeekday("sunday", DayOfWeek.Sunday);
 
+    private static readonly Parser<char, DayOfWeek> Weekday = OneOf(Monday, Tuesday, Wednesday, Thursday, Friday,
+        Saturday, Sunday);
 
     private static Parser<char, string> Pluralizable(this Parser<char, string> parser)
     {
@@ -121,6 +133,8 @@ public static class HumanTimeParser
         Try(Keyword("today").Select(_ => HumanTime.Today)),
         Try(Keyword("tomorrow").Select(_ => HumanTime.Today.AddOffset(OffsetUnit.Days, 1))),
         Try(Keyword("yesterday").Select(_ => HumanTime.Today.AddOffset(OffsetUnit.Days, -1))),
+        Try(Month.Select(HumanTime.Month)),
+        Try(Weekday.Select(HumanTime.Date)),
         Try(RelativeDate)
     );
 
@@ -139,4 +153,38 @@ public static class HumanTimeParser
 
         throw new NotImplementedException("Need to support offsets for other time types");
     }
+
+    private static readonly Parser<char, string> Meridian = OneOf(Keyword("am"), Keyword("pm"));
+
+    private static readonly Parser<char, TimeOnly> OClock = Map(
+        (h, pm) => new TimeOnly(h.ToHour(pm), 0),
+        Integer.Before(Keyword("o").Then(Keyword("'clock"))),
+        Meridian.Optional().Select(maybe => maybe is { HasValue: true, Value: "pm" })
+    );
+
+    private static readonly Parser<char, TimeOnly> HourMinuteMeridian = Map(
+        (h, minute, pm) => new TimeOnly(h.ToHour(pm), minute),
+        Integer,
+        Punctuation(':').Then(Integer).Optional().Select(minute => minute.HasValue ? minute.Value : 0),
+        Meridian.Optional().Select(meridian => meridian is { HasValue: true, Value: "pm"})
+    );
+
+    private static int ToHour(this int hour, bool pm)
+    {
+        var am = !pm;
+        return hour switch
+        {
+            12 when am => 0,
+            12 when pm => 12,
+            > 12 => hour,
+            _ => pm ? hour + 12 : hour,
+        };
+    }
+
+    internal static readonly Parser<char, TimeOnly> Time = OneOf(
+        Try(OClock),
+        Try(HourMinuteMeridian),
+        Try(Keyword("midnight").ThenReturn(new TimeOnly(0, 0))),
+        Try(Keyword("noon").ThenReturn(new TimeOnly(12, 0))));
+
 }

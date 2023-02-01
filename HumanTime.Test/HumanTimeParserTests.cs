@@ -122,4 +122,20 @@ public class HumanTimeParserTests
         var result = HumanTimeParser.Date.ParseOrThrow("the day before the day after may 5, 2025");
         Assert.Equal(HumanTime.Date(2025, 5, 5), result);
     }
+
+    [Theory]
+    [InlineData("6 o'clock", 6, 0)]
+    [InlineData("6 o'clock pm", 18, 0)]
+    [InlineData("12 o 'clock pm", 12, 0)]
+    [InlineData("12 o 'clock am", 0, 0)]
+    [InlineData("19:18", 19, 18)]
+    [InlineData("4:20pm", 16, 20)]
+    [InlineData("6:09", 6, 9)]
+    [InlineData("2pm", 14, 0)]
+    [InlineData("12:34 am", 0, 34)]
+    public void TestTime(string input, int hour, int minute)
+    {
+        var result = HumanTimeParser.Time.ParseOrThrow(input);
+        Assert.Equal(new TimeOnly(hour, minute), result);
+    }
 }

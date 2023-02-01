@@ -28,8 +28,10 @@ public abstract record HumanTime
     
     private static readonly TimeZoneInfo CentralTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Chicago");
     
-    private static DateTimeOffset NowCentral => TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.UtcNow.DateTime, CentralTimeZone);
-    private static DateOnly TodayCentral => DateOnly.FromDateTime(NowCentral.DateTime);
+    public static Func<DateTimeOffset> GetNowCentral { get; set; } = () =>
+        TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.UtcNow.DateTime, CentralTimeZone);
+    
+    private static DateOnly TodayCentral => DateOnly.FromDateTime(GetNowCentral().DateTime);
 
     public static HumanTime Date(DateOnly date)
     {
@@ -57,13 +59,25 @@ public abstract record HumanTime
         month = number1;
         int day = number2;
         
-        var date = new DateOnly(NowCentral.Year, month, day);
+        var date = new DateOnly(GetNowCentral().Year, month, day);
         if (date < TodayCentral)
         {
             date = date.AddYears(1);
         }
 
         return new HumanDate() { Date = date };
+    }
+    
+    public static HumanTime Date(DayOfWeek dayOfWeek)
+    {
+        var today = (int)TodayCentral.DayOfWeek;
+        var target = (int)dayOfWeek;
+        target = target < today ? target + 7 : target;
+
+        var offset = target - today;
+        offset = offset == 0 ? 7 : offset;
+
+        return new HumanDate { Date = TodayCentral.AddDays(offset) };
     }
 
     public static HumanTime Today => Date(TodayCentral);
@@ -96,6 +110,15 @@ public abstract record HumanTime
             Description = $"{CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month)} {year}",
             StartDate = new DateOnly(year, month, 1),
         };
+    }
+    
+    public static HumanTime Month(int month)
+    {
+        var today = GetNowCentral();
+        int thisMonth = today.Month;
+        int year = thisMonth >= month ? today.Year + 1 : today.Year;
+        
+        return Month(year, month);
     }
 
     public static HumanTime DateTime(DateOnly date, TimeOnly time, TimeZoneInfo timezone)
