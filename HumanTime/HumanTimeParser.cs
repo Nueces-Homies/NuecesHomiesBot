@@ -163,11 +163,23 @@ public static class HumanTimeParser
     );
 
     private static readonly Parser<char, TimeOnly> HourMinuteMeridian = Map(
-        (h, minute, pm) => new TimeOnly(h.ToHour(pm), minute),
+        (h, minute, pm) =>
+        {
+            try
+            {
+                return (TimeOnly?)new TimeOnly(h.ToHour(pm), minute);
+            }
+            catch
+            {
+                return null;
+            }
+        },
         Integer,
         Punctuation(':').Then(Integer).Optional().Select(minute => minute.HasValue ? minute.Value : 0),
         Meridian.Optional().Select(meridian => meridian is { HasValue: true, Value: "pm"})
-    );
+    )
+        .Assert(time => time.HasValue)
+        .Select(time => time!.Value);
 
     private static int ToHour(this int hour, bool pm)
     {
@@ -187,4 +199,56 @@ public static class HumanTimeParser
         Try(Keyword("midnight").ThenReturn(new TimeOnly(0, 0))),
         Try(Keyword("noon").ThenReturn(new TimeOnly(12, 0))));
 
+    private static Parser<char, TimeZoneInfo> TimeZoneGroup(string t1, string t2, string t3, TimeZoneInfo tz) =>
+        OneOf(Try(Keyword(t1)), Try(Keyword(t2)), Try(Keyword(t3))).ThenReturn(tz);
+
+    private static Parser<char, TimeZoneInfo> TimeZoneGroup(string t1, string t2, TimeZoneInfo tz) =>
+        OneOf(Try(Keyword(t1)), Try(Keyword(t2))).ThenReturn(tz);
+    
+    private static Parser<char, TimeZoneInfo> TimeZoneGroup(string t1, TimeZoneInfo tz) => Try(Keyword(t1)).ThenReturn(tz);
+
+    private static readonly TimeZoneInfo CentralTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Chicago");
+    
+    internal static readonly Parser<char, TimeZoneInfo> KnownTimeZones = OneOf(
+        TimeZoneGroup("pt", "pdt", "pst", TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles")),
+        TimeZoneGroup("mt", "mdt", "mst", TimeZoneInfo.FindSystemTimeZoneById("America/Denver")),
+        TimeZoneGroup("ct", "cdt", "cst", TimeZoneInfo.FindSystemTimeZoneById("America/Chicago")),
+        TimeZoneGroup("et", "edt", "est", TimeZoneInfo.FindSystemTimeZoneById("America/New_York")),
+        TimeZoneGroup("jt", "jst", TimeZoneInfo.FindSystemTimeZoneById("Asia/Tokyo")),
+        TimeZoneGroup("cet", "cest", TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris"))
+    );
+
+    internal static readonly Parser<char, (TimeOnly, TimeZoneInfo)> TimeWithTimeZone = Map(
+        (timeOnly, timeZone) => (timeOnly, timeZone),
+        Time,
+        KnownTimeZones.Optional().Select(maybe => maybe.HasValue ? maybe.Value : CentralTimeZone)
+    );
+
+    private static readonly Parser<char, HumanTime> TimeOnDate = Map(
+        (timeWithZone, _, dateOnly) => HumanTime.DateTime(((HumanDate)dateOnly).Date, timeWithZone.Item1, timeWithZone.Item2),
+        TimeWithTimeZone,
+        Keyword("on"),
+        Date 
+    );
+    
+    private static readonly Parser<char, HumanTime> DateAtTime = Map(
+        (dateOnly, _, timeWithZone) => HumanTime.DateTime(((HumanDate)dateOnly).Date, timeWithZone.Item1, timeWithZone.Item2),
+        Date,
+        Keyword("at"),
+        TimeWithTimeZone
+    );
+    
+    private static readonly Parser<char, HumanTime> DateThenTime = Map(
+        (dateOnly, timeWithZone) => HumanTime.DateTime(((HumanDate)dateOnly).Date, timeWithZone.Item1, timeWithZone.Item2),
+        Date,
+        TimeWithTimeZone
+    );
+
+    private static readonly Parser<char, HumanTime> DateTime = OneOf(Try(TimeOnDate), Try(DateAtTime),Try(DateThenTime));
+
+    internal static readonly Parser<char, HumanTime> InputParser = OneOf(
+        Try(DateTime.Before(End))
+        // Try(Date),
+        // Try(Time).Select(HumanTime.DateTime)
+    );
 }

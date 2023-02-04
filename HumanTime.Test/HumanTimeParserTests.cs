@@ -138,4 +138,25 @@ public class HumanTimeParserTests
         var result = HumanTimeParser.Time.ParseOrThrow(input);
         Assert.Equal(new TimeOnly(hour, minute), result);
     }
+
+    [Theory]
+    [InlineData("mt", "America/Denver")]
+    [InlineData("pdt", "America/Los_Angeles")]
+    public void TestTimeZone(string input, string tzName)
+    {
+        var expected = TimeZoneInfo.FindSystemTimeZoneById(tzName);
+        var result = HumanTimeParser.KnownTimeZones.ParseOrThrow(input);
+        Assert.Equal(expected, result);
+    }
+    
+    [Theory]
+    [InlineData("4:20pm", 16, 20, "America/Chicago")]
+    [InlineData("3 am pdt", 3, 0, "America/Los_Angeles")]
+    [InlineData("11pm jst", 23, 0, "Asia/Tokyo")]
+    public void TestTimeWithZone(string input, int hour, int minute, string tzName)
+    {
+        var tz = TimeZoneInfo.FindSystemTimeZoneById(tzName);
+        var result = HumanTimeParser.TimeWithTimeZone.ParseOrThrow(input);
+        Assert.Equal((new TimeOnly(hour, minute), tz), result);
+    }
 }

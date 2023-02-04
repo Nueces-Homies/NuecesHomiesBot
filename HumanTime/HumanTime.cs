@@ -121,6 +121,14 @@ public abstract record HumanTime
         return Month(year, month);
     }
 
+    public static HumanTime Now()
+    {
+        var now = GetNowCentral();
+        var adjusted = new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, now.Offset); 
+        
+        return new HumanDateTime { DateTime = adjusted };
+    }
+
     public static HumanTime DateTime(DateOnly date, TimeOnly time, TimeZoneInfo timezone)
     {
         var dt = date.ToDateTime(time);
@@ -130,10 +138,20 @@ public abstract record HumanTime
             DateTime = new DateTimeOffset(dt, offset),
         };
     }
+    
+    public static HumanTime DateTime(TimeOnly time)
+    {
+        var now = GetNowCentral();
+        var todayWithTime = new DateTimeOffset(now.Year, now.Month, now.Day, time.Hour, time.Minute, time.Second,
+            now.Offset);
+
+        // TODO: This will break if tomorrow is a time change 
+        return new HumanDateTime { DateTime = todayWithTime < now ? todayWithTime.AddDays(1) : todayWithTime };
+    }
 
     public static HumanTime Parse(string timeString)
     {
-        return HumanTimeParser.Date.ParseOrThrow(timeString.ToLower());
+        return HumanTimeParser.InputParser.ParseOrThrow(timeString.ToLower());
     }
 }
 
