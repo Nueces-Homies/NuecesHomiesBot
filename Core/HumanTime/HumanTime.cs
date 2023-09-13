@@ -7,6 +7,7 @@ public enum HumanTimeType
     Date,
     DateTime,
     Window,
+    Unknown
 }
 
 public enum HumanTimeWindowType
@@ -14,8 +15,8 @@ public enum HumanTimeWindowType
     Month,
     Quarter,
     Trimester,
-    Semester,
     Year,
+    Holiday,
     Unspecified,
 }
 
@@ -29,6 +30,8 @@ public abstract record HumanTime
         TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.UtcNow.DateTime, CentralTimeZone);
     
     private static DateOnly TodayCentral => DateOnly.FromDateTime(GetNowCentral().DateTime);
+
+    public static HumanTime Unknown = HumanTimeUnknown.Instance;
 
     public static HumanTime Date(DateOnly date)
     {
@@ -93,6 +96,45 @@ public abstract record HumanTime
             StartDate = new DateOnly(year, 3*(quarter-1)+1, 1),
         };
     }
+    
+    public static HumanTime Trimester(int trimester, int year)
+    {
+        if (trimester is < 1 or > 3)
+        {
+            throw new ArgumentException($"Trimester {trimester} is not in [1,3]");
+        }
+
+        var word = trimester switch
+        {
+            1 => "Early",
+            2 => "Mid",
+            3 => "Late",
+        };
+        
+        return new HumanTimeWindow
+        {
+            WindowType = HumanTimeWindowType.Trimester,
+            Description = $"{word} {year}",
+            StartDate = new DateOnly(year, 4*(trimester-1)+1, 1),
+        };
+    }
+    
+    public static HumanTime Holiday(int year)
+    {
+        return new HumanTimeWindow
+        {
+            WindowType = HumanTimeWindowType.Holiday,
+            Description = $"Holiday {year}",
+            StartDate = new DateOnly(year, 11, 1),
+        };
+    }
+
+    public static HumanTime TBD = new HumanTimeWindow
+    {
+        WindowType = HumanTimeWindowType.Unspecified,
+        Description = "TBD",
+        StartDate = new DateOnly(3008, 1, 1),
+    };
 
     public static HumanTime Month(int year, int month)
     {
@@ -117,6 +159,15 @@ public abstract record HumanTime
         
         return Month(year, month);
     }
+
+    public static HumanTime Year(int year) => new HumanTimeWindow
+    {
+        WindowType = HumanTimeWindowType.Year,
+        Description = "{year}",
+        
+        // We choose the end of the year for sorting purposes
+        StartDate = new DateOnly(year, 12, 31),
+    };
 
     public static HumanTime Now()
     {
@@ -151,10 +202,28 @@ public abstract record HumanTime
         return new HumanDateTime { DateTime = todayWithTime < now ? todayWithTime.AddDays(1) : todayWithTime };
     }
 
+
     public static HumanTime Parse(string timeString)
     {
-        var recognizer = new HumanTimeRecognizer(GetNowCentral);
-        return recognizer.Recognize(timeString.ToLower());
+        // We create this dynamically so that we get the correct version of GetNowCentral
+        IHumanTimeRecognizer[] recognizers = {
+            new QuarterRecognizer(),
+            new TrimesterRecognizer(),
+            new MonthRecognizer(),
+            new YearRecognizer(),
+            new HolidayRecognizer(),
+            new NLPRecognizer(GetNowCentral),
+        };
+            
+        foreach (var recognizer in recognizers)
+        {
+            if (recognizer.TryRecognize(timeString.ToLower(), out var time))
+            {
+                return time;
+            }
+        }
+
+        return Unknown;
     }
 }
 
@@ -185,4 +254,19 @@ public sealed record HumanTimeWindow : HumanTime
     public required DateOnly StartDate { get; init; }
 
     public override string ToString() => Description;
+}
+
+public sealed record HumanTimeUnknown : HumanTime
+{
+    public static readonly HumanTimeUnknown Instance = new HumanTimeUnknown();
+    public override HumanTimeType TimeType => HumanTimeType.Unknown;
+
+    private HumanTimeUnknown()
+    {
+    }
+
+    public override string ToString()
+    {
+        return "Unknown";
+    }
 }

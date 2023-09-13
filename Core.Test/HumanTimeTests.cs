@@ -12,7 +12,6 @@ public class HumanTimeTests
         HumanTime.GetNowCentral = () => testTime;
 
         yield return new object[] { new TestCase("5/5",       HumanTime.Date(2023, 5, 5)) };
-        // yield return new object[] { new TestCase("5/2025",    HumanTime.Month(2025, 5)) };
         yield return new object[] { new TestCase("5/25/2025", HumanTime.Date(2025, 5, 25)) };
         yield return new object[] { new TestCase("1/14",      HumanTime.Date(2024, 1, 14)) };
         
@@ -26,29 +25,31 @@ public class HumanTimeTests
         yield return new object[] { new TestCase("February 4th",           HumanTime.Date(2024, 2, 4)) };
         
         yield return new object[] { new TestCase("now",           HumanTime.Now()) };
-        //
-        // yield return new object[] { new TestCase("April",     HumanTime.Month(2023, 4)) };
-        // yield return new object[] { new TestCase("May",       HumanTime.Month(2023, 5)) };
-        // yield return new object[] { new TestCase("June",      HumanTime.Month(2023, 6)) };
-        // yield return new object[] { new TestCase("July",      HumanTime.Month(2023, 7)) };
-        // yield return new object[] { new TestCase("August",    HumanTime.Month(2023, 8)) };
-        // yield return new object[] { new TestCase("September", HumanTime.Month(2023, 9)) };
-        // yield return new object[] { new TestCase("October",   HumanTime.Month(2023, 10)) };
-        // yield return new object[] { new TestCase("November",  HumanTime.Month(2023, 11)) };
-        // yield return new object[] { new TestCase("December",  HumanTime.Month(2023, 12)) };
-        // yield return new object[] { new TestCase("January",   HumanTime.Month(2024, 1)) };
-        // yield return new object[] { new TestCase("February",  HumanTime.Month(2024, 2)) };
-        // yield return new object[] { new TestCase("March",     HumanTime.Month(2024, 3)) };
-        //
-        // yield return new object[] { new TestCase("Friday",    HumanTime.Date(2023, 3, 17)) };
-        // yield return new object[] { new TestCase("Saturday",  HumanTime.Date(2023, 3, 18)) };
-        // yield return new object[] { new TestCase("Sunday",    HumanTime.Date(2023, 3, 19)) };
-        // yield return new object[] { new TestCase("Monday",    HumanTime.Date(2023, 3, 20)) };
-        // yield return new object[] { new TestCase("Tuesday",   HumanTime.Date(2023, 3, 21)) };
-        // yield return new object[] { new TestCase("Wednesday", HumanTime.Date(2023, 3, 22)) };
-        // yield return new object[] { new TestCase("Thursday",  HumanTime.Date(2023, 3, 23)) };
-        //
-        //
+        
+        yield return new object[] { new TestCase("April",     HumanTime.Month(2023, 4)) };
+        yield return new object[] { new TestCase("May",       HumanTime.Month(2023, 5)) };
+        yield return new object[] { new TestCase("June",      HumanTime.Month(2023, 6)) };
+        yield return new object[] { new TestCase("July",      HumanTime.Month(2023, 7)) };
+        yield return new object[] { new TestCase("August",    HumanTime.Month(2023, 8)) };
+        yield return new object[] { new TestCase("September", HumanTime.Month(2023, 9)) };
+        yield return new object[] { new TestCase("October",   HumanTime.Month(2023, 10)) };
+        yield return new object[] { new TestCase("November",  HumanTime.Month(2023, 11)) };
+        yield return new object[] { new TestCase("December",  HumanTime.Month(2023, 12)) };
+        yield return new object[] { new TestCase("January",   HumanTime.Month(2024, 1)) };
+        yield return new object[] { new TestCase("February",  HumanTime.Month(2024, 2)) };
+        yield return new object[] { new TestCase("March",     HumanTime.Month(2024, 3)) };
+        
+        yield return new object[] { new TestCase("March 2027",     HumanTime.Month(2027, 3)) };
+        
+        yield return new object[] { new TestCase("Thursday",  HumanTime.Date(2023, 3, 16)) };
+        yield return new object[] { new TestCase("Friday",    HumanTime.Date(2023, 3, 17)) };
+        yield return new object[] { new TestCase("Saturday",  HumanTime.Date(2023, 3, 18)) };
+        yield return new object[] { new TestCase("Sunday",    HumanTime.Date(2023, 3, 19)) };
+        yield return new object[] { new TestCase("Monday",    HumanTime.Date(2023, 3, 20)) };
+        yield return new object[] { new TestCase("Tuesday",   HumanTime.Date(2023, 3, 21)) };
+        yield return new object[] { new TestCase("Wednesday", HumanTime.Date(2023, 3, 22)) };
+        
+        
         yield return new object[] { new TestCase("5 days before August 20th, 2032", HumanTime.Date(2032, 8, 15)) };
         yield return new object[] { new TestCase("3 days after December 18, 2022", HumanTime.Date(2022, 12, 21)) };
         yield return new object[] { new TestCase("the 12 days after December 25, 2022", HumanTime.Date(2023, 1, 6)) };
@@ -62,7 +63,6 @@ public class HumanTimeTests
         var pacificTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles");
         var japaneseTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Tokyo");
         
-        // yield return new object[] { new TestCase("3:20pm", HumanTime.DateTime(new TimeOnly(15, 20))) };
         yield return new object[]
         {
             new TestCase("December 3 at 4:20am",
@@ -83,6 +83,11 @@ public class HumanTimeTests
             new TestCase("February 2nd 8:47pm JST",
                 HumanTime.DateTime(new DateOnly(2024, 2, 2), new TimeOnly(20, 47), japaneseTimeZone))
         };
+
+        yield return new object[] { new TestCase("Q2 2024", HumanTime.Quarter(2, 2024)) };
+        yield return new object[] { new TestCase("Late 2025", HumanTime.Trimester(3, 2025)) };
+        yield return new object[] { new TestCase("Holiday 2024", HumanTime.Holiday(2024)) };
+        yield return new object[] { new TestCase("2026", HumanTime.Year(2026)) };
     }
     
     [Theory]

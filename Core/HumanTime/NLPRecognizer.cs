@@ -5,19 +5,33 @@ using Microsoft.Recognizers.Text.DateTime;
 
 namespace Core.HumanTime;
 
-public class HumanTimeRecognizer
+public class NLPRecognizer : IHumanTimeRecognizer
 {
     private Func<DateTimeOffset> GetBaseTime { get; init; }
     
     private DateTimeModel Model { get; set; }
     
-    internal HumanTimeRecognizer(Func<DateTimeOffset> getBaseTimeFunc)
+    internal NLPRecognizer(Func<DateTimeOffset> getBaseTimeFunc)
     {
         Model = new DateTimeRecognizer().GetDateTimeModel(culture: Culture.English);
         GetBaseTime = getBaseTimeFunc;
     }
 
-    internal HumanTime Recognize(string query)
+    public bool TryRecognize(string query, out HumanTime time)
+    {
+        try
+        {
+            time = Recognize(query);
+            return true;
+        }
+        catch
+        {
+            time = HumanTime.Unknown; 
+            return false;
+        }
+    }
+
+    private HumanTime Recognize(string query)
     {
         var refTime = GetBaseTime();
 
@@ -25,19 +39,27 @@ public class HumanTimeRecognizer
         
         var results = Model.Parse(queryWithoutTimezone, refTime.DateTime);
         var values = (List<Dictionary<string, string>>) results[0].Resolution["values"];
-        
-        var times = values.Select(value => ToHumanTime(results[0].TypeName, value));
-        // var refTimeAsHumanTime = HumanTime.DateTime(refTime);
-        
-        // foreach (var time in times)
-        // {
-        //     if (time > refTimeAsHumanTime)
-        //     {
-        //         return time;
-        //     }
-        // }
 
-        var result = times.Last();
+        var times = values.Select(value => ToHumanTime(results[0].TypeName, value)).ToArray();
+
+        var result = HumanTime.Unknown;
+        if (times.Length > 1)
+        {
+            foreach (var candidate in times)
+            {
+                switch (candidate)
+                {
+                    case HumanDate dateCandidate when dateCandidate.Date >= DateOnly.FromDateTime(refTime.Date):
+                    case HumanDateTime dateTimeCandidate when dateTimeCandidate.DateTime >= refTime.DateTime:
+                        result = candidate;
+                        break;
+                }
+            }
+        }
+        else
+        {
+            result = times.First();
+        }
 
         if (result is not HumanDateTime hdt) return result;
         
@@ -65,7 +87,7 @@ public class HumanTimeRecognizer
         {
             "datetimeV2.date" => ToHumanTimeDate(data),
             "datetimeV2.datetime" => ToHumanTimeDateTime(data),
-            _ => throw new ArgumentException($"Unknown type {typeName}"),
+            _ => throw new ArgumentException($"Instance type {typeName}"),
         };
     }
 
