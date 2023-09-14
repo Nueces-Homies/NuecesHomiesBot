@@ -1,9 +1,8 @@
-﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Microsoft.Recognizers.Text;
 using Microsoft.Recognizers.Text.DateTime;
 
-namespace Core.HumanTime;
+namespace Core.Common.HumanTime;
 
 public class NLPRecognizer : IHumanTimeRecognizer
 {
@@ -17,7 +16,7 @@ public class NLPRecognizer : IHumanTimeRecognizer
         GetBaseTime = getBaseTimeFunc;
     }
 
-    public bool TryRecognize(string query, out HumanTime time)
+    public bool TryRecognize(string query, out Common.HumanTime.HumanTime time)
     {
         try
         {
@@ -26,12 +25,12 @@ public class NLPRecognizer : IHumanTimeRecognizer
         }
         catch
         {
-            time = HumanTime.Unknown; 
+            time = Common.HumanTime.HumanTime.Unknown; 
             return false;
         }
     }
 
-    private HumanTime Recognize(string query)
+    private Common.HumanTime.HumanTime Recognize(string query)
     {
         var refTime = GetBaseTime();
 
@@ -42,7 +41,7 @@ public class NLPRecognizer : IHumanTimeRecognizer
 
         var times = values.Select(value => ToHumanTime(results[0].TypeName, value)).ToArray();
 
-        var result = HumanTime.Unknown;
+        var result = Common.HumanTime.HumanTime.Unknown;
         if (times.Length > 1)
         {
             foreach (var candidate in times)
@@ -66,7 +65,7 @@ public class NLPRecognizer : IHumanTimeRecognizer
         var dto = hdt.DateTime;
         var date = DateOnly.FromDateTime(dto.DateTime);
         var time = TimeOnly.FromDateTime(dto.DateTime);
-        return HumanTime.DateTime(date, time, timezone);
+        return Common.HumanTime.HumanTime.DateTime(date, time, timezone);
 
     }
 
@@ -81,7 +80,7 @@ public class NLPRecognizer : IHumanTimeRecognizer
         return output;
     }
 
-    private static HumanTime ToHumanTime(string typeName, Dictionary<string, string> data)
+    private static Common.HumanTime.HumanTime ToHumanTime(string typeName, Dictionary<string, string> data)
     {
         return typeName switch
         {
@@ -91,14 +90,14 @@ public class NLPRecognizer : IHumanTimeRecognizer
         };
     }
 
-    private static HumanTime ToHumanTimeDate(Dictionary<string, string> data)
+    private static Common.HumanTime.HumanTime ToHumanTimeDate(Dictionary<string, string> data)
     {
         var value = data["value"];
         var date = DateOnly.Parse(value);
-        return HumanTime.Date(date);
+        return Common.HumanTime.HumanTime.Date(date);
     }
 
-    private static HumanTime ToHumanTimeDateTime(Dictionary<string, string> data)
+    private static Common.HumanTime.HumanTime ToHumanTimeDateTime(Dictionary<string, string> data)
     {
         var value = data["value"];
         var dateTime = DateTime.Parse(value);
@@ -106,6 +105,6 @@ public class NLPRecognizer : IHumanTimeRecognizer
 
         var tz = TimeZoneInfo.FindSystemTimeZoneById("America/Chicago");
         var offset = tz.GetUtcOffset(dateTime);
-        return HumanTime.DateTime(new DateTimeOffset(dateTime, offset));
+        return Common.HumanTime.HumanTime.DateTime(new DateTimeOffset(dateTime, offset));
     }
 }

@@ -1,3 +1,5 @@
+using Core.Database;
+
 namespace Core.Test;
 
 using FluentAssertions;

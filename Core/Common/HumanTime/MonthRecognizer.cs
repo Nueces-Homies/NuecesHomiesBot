@@ -1,17 +1,17 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Core.HumanTime;
+namespace Core.Common.HumanTime;
 
 public class MonthRecognizer : IHumanTimeRecognizer
 {
     private readonly Regex regex = new(@"^([a-z]+)( (\d\d\d\d))?$", RegexOptions.Compiled);
 
-    public bool TryRecognize(string query, out HumanTime time)
+    public bool TryRecognize(string query, out Common.HumanTime.HumanTime time)
     {
         var match = regex.Match(query);
         if (!match.Success)
         {
-            time = HumanTime.Unknown;
+            time = Common.HumanTime.HumanTime.Unknown;
             return false;
         }
 
@@ -36,7 +36,7 @@ public class MonthRecognizer : IHumanTimeRecognizer
 
         if (month == 0)
         {
-            time = HumanTime.Unknown;
+            time = Common.HumanTime.HumanTime.Unknown;
             return false;
         }
 
@@ -44,11 +44,11 @@ public class MonthRecognizer : IHumanTimeRecognizer
         {
             var yearGroup = match.Groups[2];
             var year = int.Parse(yearGroup.Value);
-            time = HumanTime.Month(year, month);
+            time = Common.HumanTime.HumanTime.Month(year, month);
         }
         else
         {
-            time = HumanTime.Month(month);
+            time = Common.HumanTime.HumanTime.Month(month);
         }
         
         return true;

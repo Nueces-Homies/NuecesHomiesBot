@@ -5,7 +5,7 @@ using Flurl;
 using Flurl.Http;
 using ProtoBuf;
 
-public partial class IGDBClient
+public class IGDBClient
 {
     private const string TokenUrl = "https://id.twitch.tv/oauth2/token";
     private const string IGDBBaseUrl = "https://api.igdb.com/v4/";

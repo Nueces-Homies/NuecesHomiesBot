@@ -1,6 +1,6 @@
-﻿namespace Core.HumanTime;
+﻿using System.Globalization;
 
-using System.Globalization;
+namespace Core.Common.HumanTime;
 
 public enum HumanTimeType
 {
@@ -81,7 +81,7 @@ public abstract record HumanTime
     }
 
     public static HumanTime Today => Date(TodayCentral);
-
+    
     public static HumanTime Quarter(int quarter, int year)
     {
         if (quarter is < 1 or > 4)
@@ -92,7 +92,6 @@ public abstract record HumanTime
         return new HumanTimeWindow
         {
             WindowType = HumanTimeWindowType.Quarter,
-            Description = $"Q{quarter} {year}",
             StartDate = new DateOnly(year, 3*(quarter-1)+1, 1),
         };
     }
@@ -114,7 +113,6 @@ public abstract record HumanTime
         return new HumanTimeWindow
         {
             WindowType = HumanTimeWindowType.Trimester,
-            Description = $"{word} {year}",
             StartDate = new DateOnly(year, 4*(trimester-1)+1, 1),
         };
     }
@@ -124,7 +122,6 @@ public abstract record HumanTime
         return new HumanTimeWindow
         {
             WindowType = HumanTimeWindowType.Holiday,
-            Description = $"Holiday {year}",
             StartDate = new DateOnly(year, 11, 1),
         };
     }
@@ -132,7 +129,6 @@ public abstract record HumanTime
     public static HumanTime TBD = new HumanTimeWindow
     {
         WindowType = HumanTimeWindowType.Unspecified,
-        Description = "TBD",
         StartDate = new DateOnly(3008, 1, 1),
     };
 
@@ -146,7 +142,7 @@ public abstract record HumanTime
         return new HumanTimeWindow
         {
             WindowType = HumanTimeWindowType.Month,
-            Description = $"{CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month)} {year}",
+            // Description = $"{CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month)} {year}",
             StartDate = new DateOnly(year, month, 1),
         };
     }
@@ -163,7 +159,6 @@ public abstract record HumanTime
     public static HumanTime Year(int year) => new HumanTimeWindow
     {
         WindowType = HumanTimeWindowType.Year,
-        Description = "{year}",
         
         // We choose the end of the year for sorting purposes
         StartDate = new DateOnly(year, 12, 31),
@@ -249,11 +244,30 @@ public sealed record HumanTimeWindow : HumanTime
 {
     public override HumanTimeType TimeType => HumanTimeType.Window;
     
-    public required string Description { get; init; }
     public required HumanTimeWindowType WindowType { get; init; }
     public required DateOnly StartDate { get; init; }
 
-    public override string ToString() => Description;
+    public override string ToString()
+    {
+        string trimesterName = ((StartDate.Month-1) / 4) switch
+        {
+            0 => "early",
+            1 => "mid",
+            2 => "late"
+        };
+        
+        return WindowType switch
+        {
+            HumanTimeWindowType.Month => 
+                $"{CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(StartDate.Month)} {StartDate.Year}",
+            HumanTimeWindowType.Quarter => $"Q{(StartDate.Month-1)/3 + 1} {StartDate.Year}",
+            HumanTimeWindowType.Trimester => $"{trimesterName} {StartDate.Year}",
+            HumanTimeWindowType.Year => StartDate.Year.ToString(),
+            HumanTimeWindowType.Holiday => $"Holiday {StartDate.Year}",
+            HumanTimeWindowType.Unspecified => "TBD",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
 }
 
 public sealed record HumanTimeUnknown : HumanTime

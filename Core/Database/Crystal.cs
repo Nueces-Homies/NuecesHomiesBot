@@ -1,4 +1,4 @@
-namespace Core;
+namespace Core.Database;
 
 public readonly record struct Crystal (ulong Value)
 {

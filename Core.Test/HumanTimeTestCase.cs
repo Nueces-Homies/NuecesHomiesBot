@@ -1,18 +1,19 @@
-﻿namespace Core.Test;
+﻿using Core.Common.HumanTime;
 
-using HumanTime;
+namespace Core.Test;
+
 using Xunit.Abstractions;
 
 public class HumanTimeTestCase : IXunitSerializable
 {
     public string? InputString { get; private set; }
-    public HumanTime? Expected { get; private set; }
+    public Common.HumanTime.HumanTime? Expected { get; private set; }
     
     public HumanTimeTestCase()
     {
     }
 
-    public HumanTimeTestCase(string input, HumanTime expected)
+    public HumanTimeTestCase(string input, Common.HumanTime.HumanTime expected)
     {
         this.InputString = input;
         this.Expected = expected;
@@ -32,7 +33,6 @@ public class HumanTimeTestCase : IXunitSerializable
             {
                 WindowType = info.GetValue<HumanTimeWindowType>("WindowType"),
                 StartDate = DateOnly.Parse(value),
-                Description = info.GetValue<string>("Description"),
             },
             _ => throw new ArgumentOutOfRangeException()
         };
@@ -56,7 +56,6 @@ public class HumanTimeTestCase : IXunitSerializable
                 break;
             case HumanTimeWindow window:
                 info.AddValue("Value", window.StartDate.ToString());
-                info.AddValue("Description", window.Description);
                 info.AddValue("WindowType", window.WindowType);
                 break;
         }
