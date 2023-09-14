@@ -31,7 +31,6 @@ public class HumanTimeTestCase : IXunitSerializable
             {
                 WindowType = info.GetValue<HumanTimeWindowType>("WindowType"),
                 StartDate = DateOnly.Parse(value),
-                Description = info.GetValue<string>("Description"),
             },
             _ => throw new ArgumentOutOfRangeException()
         };
@@ -55,7 +54,6 @@ public class HumanTimeTestCase : IXunitSerializable
                 break;
             case HumanTimeWindow window:
                 info.AddValue("Value", window.StartDate.ToString());
-                info.AddValue("Description", window.Description);
                 info.AddValue("WindowType", window.WindowType);
                 break;
         }
