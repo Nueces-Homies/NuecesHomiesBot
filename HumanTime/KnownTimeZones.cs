@@ -1,7 +1,6 @@
 ﻿using System.Text;
-using System.Text.RegularExpressions;
 
-namespace Core.HumanTime;
+namespace HumanTime;
 
 public class KnownTimeZones
 {

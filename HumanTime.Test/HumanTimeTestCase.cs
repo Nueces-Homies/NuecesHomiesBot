@@ -1,6 +1,5 @@
-﻿namespace Core.Test;
+﻿namespace HumanTime.Test;
 
-using HumanTime;
 using Xunit.Abstractions;
 
 public class HumanTimeTestCase : IXunitSerializable

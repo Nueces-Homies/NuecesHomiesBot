@@ -1,4 +1,4 @@
-﻿namespace Core.HumanTime;
+﻿namespace HumanTime;
 
 internal interface IHumanTimeRecognizer
 {
