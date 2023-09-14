@@ -99,4 +99,56 @@ public class HumanTimeTests
         var actual = HumanTime.Parse(testCase.InputString);
         Assert.Equal(testCase.Expected, actual);
     }
+
+    [Theory]
+    [InlineData(1, 2024, "Q1 2024")]
+    [InlineData(2, 2025, "Q2 2025")]
+    [InlineData(3, 2026, "Q3 2026")]
+    [InlineData(4, 2027, "Q4 2027")]
+    public void TestQuarterDescription(int quarter, int year, string expected)
+    {
+        var window = HumanTime.Quarter(quarter, year);
+        Assert.Equal(expected, window.ToString());
+    }
+    
+    [Theory]
+    [InlineData(1, 2024, "early 2024")]
+    [InlineData(2, 2025, "mid 2025")]
+    [InlineData(3, 2026, "late 2026")]
+    public void TestTrimesterDescription(int trimester, int year, string expected)
+    {
+        var window = HumanTime.Trimester(trimester, year);
+        Assert.Equal(expected, window.ToString());
+    }
+    
+    [Theory]
+    [InlineData(1,  2024, "January 2024")]
+    [InlineData(2,  2025, "February 2025")]
+    [InlineData(3,  2026, "March 2026")]
+    [InlineData(4,  2024, "April 2024")]
+    [InlineData(5,  2025, "May 2025")]
+    [InlineData(6,  2026, "June 2026")]
+    [InlineData(7,  2024, "July 2024")]
+    [InlineData(8,  2025, "August 2025")]
+    [InlineData(9,  2026, "September 2026")]
+    [InlineData(10, 2024, "October 2024")]
+    [InlineData(11, 2025, "November 2025")]
+    [InlineData(12, 2026, "December 2026")]
+    public void TestMonthDescription(int month, int year, string expected)
+    {
+        var window = HumanTime.Month(year, month);
+        Assert.Equal(expected, window.ToString());
+    }
+
+    [Fact]
+    public void TestUnspecifiedDescription()
+    {
+        Assert.Equal("TBD", HumanTime.TBD.ToString());
+    }
+
+    [Fact]
+    public void TestHolidayDescription()
+    {
+        Assert.Equal("Holiday 2028", HumanTime.Holiday(2028).ToString());
+    }
 }
