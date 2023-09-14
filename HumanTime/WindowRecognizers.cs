@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Core.HumanTime;
+namespace HumanTime;
 
 public class QuarterRecognizer : IHumanTimeRecognizer
 {

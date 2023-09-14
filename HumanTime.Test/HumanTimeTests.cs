@@ -1,6 +1,5 @@
-﻿namespace Core.Test;
+﻿namespace HumanTime.Test;
 
-using HumanTime;
 using TestCase = HumanTimeTestCase;
 
 public class HumanTimeTests

@@ -1,9 +1,8 @@
-﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Microsoft.Recognizers.Text;
 using Microsoft.Recognizers.Text.DateTime;
 
-namespace Core.HumanTime;
+namespace HumanTime;
 
 public class NLPRecognizer : IHumanTimeRecognizer
 {
