@@ -27,8 +27,8 @@ public class GoogleTests
     {
         var google = new GoogleClient(this.credentialsJson);
 
-        // Summer Games Fest calendar
-        const string calendarId = "s71id26u0afr69leltrq0us0b97jp35k@import.calendar.google.com";
+        // US Holidays Calendar
+        const string calendarId = "en.usa#holiday@group.v.calendar.google.com";
         var result = await google.GetEventsAsync(calendarId);
 
         result.Events.Should().NotBeEmpty();
@@ -38,7 +38,7 @@ public class GoogleTests
     [Fact(DisplayName = "Lookup a book in Google Books")]
     public async Task CanLookupBook()
     {
-        var google = new GoogleApi.GoogleClient(this.credentialsJson);
+        var google = new GoogleClient(this.credentialsJson);
         const string isbn = "0316440884";
         var result = await google.LookupBookAsync(isbn);
 
