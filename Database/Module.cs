@@ -1,7 +1,8 @@
-﻿using Database.Migrations;
+﻿using System.Data;
+using Database.Migrations;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
-using Microsoft.Extensions.Logging;
+using Microsoft.Data.Sqlite;
 
 namespace Database;
 
@@ -9,7 +10,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 public static class Module
 {
-    public static IServiceCollection AddMigratorDependency(this IServiceCollection serviceCollection,
+    public static IServiceCollection AddDatabaseDependencies(this IServiceCollection serviceCollection, string connectionString)
+    {
+        return serviceCollection.AddScoped<IDbConnection>(_ => new SqliteConnection(connectionString));
+    }
+    
+    public static IServiceCollection AddMigratorDependencies(this IServiceCollection serviceCollection,
         string connectionString, string profile="")
     {
         return serviceCollection
@@ -21,7 +27,7 @@ public static class Module
             .Configure<RunnerOptions>(cfg =>
             {
                  cfg.Profile = profile;
-            })
-            .AddLogging(logging => logging.AddFluentMigratorConsole());
+            });
+            // .AddLogging(logging => logging.AddFluentMigratorConsole());
     }
 }

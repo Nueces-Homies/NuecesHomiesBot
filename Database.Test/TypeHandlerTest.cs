@@ -26,7 +26,7 @@ public class TypeHandlerTest
 
         // Run migration to create database and initial tables
         new ServiceCollection()
-            .AddMigratorDependency(connectionString, profile:"Test")
+            .AddMigratorDependencies(connectionString, profile:"Test")
             .BuildServiceProvider(false)
             .GetRequiredService<IMigrationRunner>()
             .MigrateUp();
