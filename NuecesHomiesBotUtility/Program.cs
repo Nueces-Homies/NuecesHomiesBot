@@ -1,22 +1,12 @@
 ﻿using System.CommandLine;
 using Core;
 using Core.Features;
-using Database;
 using Microsoft.Extensions.DependencyInjection;
-using FluentMigrator.Runner;
 using MediatR;
-
-string connectionString = $"Data Source={Guid.NewGuid()};Mode=Memory;Cache=Shared";
 
 var serviceProvider = new ServiceCollection()
     .AddNuecesHomiesCoreDependencies()
-    .AddDatabaseDependencies(connectionString)
-    .AddMigratorDependencies(connectionString)
     .BuildServiceProvider();
-
-Console.WriteLine("Migrating database...");
-var migrationRunner = serviceProvider.GetService<IMigrationRunner>();
-migrationRunner.MigrateUp();
 
 Command CreatePingCommand()
 {

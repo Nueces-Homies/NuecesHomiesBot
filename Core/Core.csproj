@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Database\Database.csproj" />
       <ProjectReference Include="..\Integrations\Integrations.csproj" />
     </ItemGroup>
 
