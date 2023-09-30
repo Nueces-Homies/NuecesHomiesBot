@@ -2,15 +2,12 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using FluentMigrator.Runner;
 using Microsoft.Extensions.Configuration;
 
 namespace DiscordBot;
 
 public class Application
 {
-    private readonly IMigrationRunner migrationRunner;
-    
     private readonly IConfiguration configuration;
     private readonly DiscordSocketClient discordClient;
     private readonly InteractionService interactionService;
@@ -19,19 +16,16 @@ public class Application
     private readonly IServiceProvider serviceProvider;
 
 
-    public Application(IConfiguration configuration, DiscordSocketClient discordClient, InteractionService interactionService, IServiceProvider serviceProvider, IMigrationRunner migrationRunner)
+    public Application(IConfiguration configuration, DiscordSocketClient discordClient, InteractionService interactionService, IServiceProvider serviceProvider)
     {
         this.configuration = configuration;
         this.discordClient = discordClient;
         this.interactionService = interactionService;
         this.serviceProvider = serviceProvider;
-        this.migrationRunner = migrationRunner;
     }
 
     public async Task RunAsync()
     {
-        migrationRunner.MigrateUp();
-        
         var token = configuration["DISCORD_TOKEN"] ?? throw new Exception("No discord token found");
 
         interactionService.Log += async message => Console.WriteLine(message.Message);

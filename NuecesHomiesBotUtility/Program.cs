@@ -3,6 +3,8 @@ using Core;
 using Core.Features;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
+using Microsoft.Extensions.Configuration;
+using NuecesHomiesBotUtility;
 
 var serviceProvider = new ServiceCollection()
     .AddNuecesHomiesCoreDependencies()
@@ -27,8 +29,10 @@ Command CreatePingCommand()
     return pingCommand;
 }
 
+var config = serviceProvider.GetRequiredService<IConfiguration>();
 
 var rootCommand = new RootCommand();
 rootCommand.AddCommand(CreatePingCommand());
+rootCommand.AddCommand(MigrateCommandBuilder.BuildMigrateCommand(() => config["DATABASE_PATH"]!));
 return await rootCommand.InvokeAsync(args);
 

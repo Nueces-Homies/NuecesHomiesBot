@@ -8,14 +8,19 @@
 
     <ItemGroup>
       <PackageReference Include="Dapper" Version="2.0.151" />
-      <PackageReference Include="FluentMigrator" Version="3.3.2" />
-      <PackageReference Include="FluentMigrator.Runner" Version="3.3.2" />
-      <PackageReference Include="FluentMigrator.Runner.SQLite" Version="3.3.2" />
+      <PackageReference Include="dbup" Version="5.0.8" />
+      <PackageReference Include="dbup-sqlite" Version="5.0.8" />
       <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.11" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\HumanTime\HumanTime.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Migrations\001_CreateGamesTable.sql" />
+      <EmbeddedResource Include="Migrations\002_CreateMoviesTable.sql" />
     </ItemGroup>
 
 </Project>

@@ -1,7 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using Core;
-using Database;
 using Discord.Interactions;
 using Discord.WebSocket;
 using DiscordBot;

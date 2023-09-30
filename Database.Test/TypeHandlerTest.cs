@@ -1,9 +1,5 @@
 ﻿
-using System.Reflection;
 using FluentAssertions;
-using FluentMigrator.Runner;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Database.Test;
 
@@ -20,22 +16,16 @@ public class TypeHandlerTest
     
     public TypeHandlerTest()
     {
-        var config = new ConfigurationBuilder()
-            .AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true)
-            .Build();
-        config["DATABASE_PATH"] = $"Data Source={Guid.NewGuid()};Mode=Memory;Cache=Shared";
-        
         SqlMapper.AddTypeHandler(new HumanTimeTypeHandler());
         SqlMapper.AddTypeHandler(new CrystalTypeHandler());
-        DbConnection = new SqliteConnection(config["DATABASE_PATH"]);
-
-        // Run migration to create database and initial tables
-        new ServiceCollection()
-            .AddSingleton<IConfiguration>(config)
-            .AddMigratorDependencies()
-            .BuildServiceProvider(false)
-            .GetRequiredService<IMigrationRunner>()
-            .MigrateUp();
+        
+        DbConnection = new SqliteConnection("Data Source=:memory:");
+        DbConnection.Open();
+        
+        MigratorBuilder
+            .GetMigrator(DbConnection, includeTestScripts: false)
+            .Build()
+            .PerformUpgrade();
     }
     
     [Fact]

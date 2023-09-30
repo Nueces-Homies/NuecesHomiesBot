@@ -1,18 +1,9 @@
-using Xunit.Abstractions;
-
 namespace Database.Test;
 
 using FluentAssertions;
 
 public class CrystalTest
 {
-    private readonly ITestOutputHelper testOutputHelper;
-
-    public CrystalTest(ITestOutputHelper testOutputHelper)
-    {
-        this.testOutputHelper = testOutputHelper;
-    }
-
     [Fact]
     public void RapidGenerationIsMonotonicallyIncreasing()
     {
@@ -48,11 +39,5 @@ file static class CrystalUtils
         ulong mask = 0xFFFF;
         mask = ~mask;
         return crystal.Value & mask;
-    }
-
-    public static ulong ToTime(this Crystal crystal)
-    {
-        var withoutNoise = crystal.WithoutNoise();
-        return withoutNoise >> 16;
     }
 }

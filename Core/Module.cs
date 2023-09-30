@@ -34,8 +34,7 @@ public static class Module
     private static IServiceCollection AddDataDependencies(this IServiceCollection serviceCollection)
     {
         return serviceCollection
-            .AddDatabaseDependencies()
-            .AddMigratorDependencies();
+            .AddDatabaseDependencies();
     }
 
     public static IServiceCollection AddNuecesHomiesCoreDependencies(this IServiceCollection serviceCollection)
