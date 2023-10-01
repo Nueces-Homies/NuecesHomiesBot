@@ -44,6 +44,7 @@ public class Application
     {
         var guild = ulong.Parse(configuration["GUILD_ID"] ?? throw new Exception("No guild id found"));
         await interactionService.RegisterCommandsToGuildAsync(guild, deleteMissing: true);
+
     }
     
     private async Task HandleInteraction(SocketInteraction interaction)

@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Database;
 using Integrations.IGDBApi;
+using Integrations.TMDbApi;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,6 +29,12 @@ public static class Module
                 var clientSecret = config["TWITCH_CLIENT_SECRET"] ??
                                    throw new Exception("TWITCH_CLIENT_SECRET missing");
                 return new IGDB(clientId, clientSecret);
+            })
+            .AddSingleton<ITMDb>(provider =>
+            {
+                var config = provider.GetRequiredService<IConfiguration>();
+                var tmdbKey = config["TMDB_KEY"] ?? throw new Exception("TMDB_KEY missing");
+                return new TMDb(tmdbKey);
             });
     }
 
